@@ -30,6 +30,11 @@ chmod 0700 $chroot/$bosh_dir/etc/monitrc
 mkdir -p $chroot/$bosh_app_dir/monit
 touch $chroot/$bosh_app_dir/monit/empty.monitrc
 
+# Helper script provides permit_monit_access function that BOSH jobs can source
+# to gain firewall access to the monit API for controlled failover scenarios
+cp $dir/assets/monit-access-helper.sh $chroot/$bosh_dir/etc/
+chmod +x $chroot/$bosh_dir/etc/monit-access-helper.sh
+
 # Install monit systemd service (uses bosh-agent firewall-allow for access control)
 cp "$(dirname "$0")/assets/monit.service" "${chroot}/lib/systemd/system/"
 run_in_chroot "${chroot}" "systemctl enable monit.service"
