@@ -34,6 +34,7 @@ module Bosh::Stemcell
             :bosh_sysctl,
             :bosh_limits,
             :bosh_users,
+            :bosh_base_firewall,
             :bosh_monit,
             :bosh_ntp,
             :bosh_sudoers,
