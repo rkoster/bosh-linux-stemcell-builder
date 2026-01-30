@@ -1,0 +1,30 @@
+#!/usr/sbin/nft -f
+#
+# BOSH Base Firewall Rules
+#
+# This file sets up the base nftables rules that block access to sensitive
+# BOSH services by default. The bosh-agent will dynamically add rules to
+# allow specific cgroups (agent, monit) to access these services.
+#
+# Protected ports:
+#   - 2822: monit HTTP API (localhost only)
+#   - 4222: NATS messaging (Jammy only, Noble uses ephemeral creds)
+#   - 6868: bosh-agent HTTPS API
+#
+
+table inet bosh_firewall {
+    # Chain for filtering outbound connections to localhost BOSH services
+    chain output_filter {
+        type filter hook output priority 0; policy accept;
+
+        # Allow established and related connections
+        ct state established,related accept
+
+        # Block access to monit API by default (agent will add exceptions)
+        ip daddr 127.0.0.1 tcp dport 2822 drop
+
+        # Block access to NATS by default (agent will add exceptions for Jammy)
+        # Note: Noble uses ephemeral NATS credentials, so NATS firewall is not needed
+        ip daddr 127.0.0.1 tcp dport 4222 drop
+    }
+}
